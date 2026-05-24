@@ -1,36 +1,42 @@
 const todoInput = document.querySelector("#todo-input");
 const addTaskButton = document.querySelector("#add-task-btn");
 const todoList = document.querySelector("#todo-list");
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-function addTask() {
-    const taskText = todoInput.value.trim();
+function createTask(taskText) {
+  const newTask = document.createElement("li");
 
-    if (taskText === "") {
-        return;
-    }
-    const newTask = document.createElement("li");
+  newTask.addEventListener("click", function () {
+    newTask.classList.toggle("completed");
+  });
 
-    newTask.addEventListener("click", function () {
-        newTask.classList.toggle("completed");
-});
+  const deleteButton = document.createElement("button");
 
-    const deleteButton = document.createElement("button");
+  newTask.textContent = taskText;
 
-    newTask.textContent = taskText;
+  deleteButton.textContent = "Eliminar";
 
-    deleteButton.textContent = "Eliminar";
-
-    deleteButton.addEventListener("click", function () {
+  deleteButton.addEventListener("click", function () {
     newTask.remove();
-});
+  });
 
-    newTask.appendChild(deleteButton);
+  newTask.appendChild(deleteButton);
 
-    todoList.appendChild(newTask);
+  todoList.appendChild(newTask);
+}
+function addTask() {
+  const taskText = todoInput.value.trim();
 
-    localStorage.setItem("lastTask", taskText);
+  if (taskText === "") {
+    return;
+  }
 
-    todoInput.value = "";
+  createTask(taskText);
+  tasks.push(taskText);
+
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+
+  todoInput.value = "";
 }
 
 addTaskButton.addEventListener("click", function () {
@@ -41,4 +47,8 @@ todoInput.addEventListener("keydown", function (event) {
   if (event.key === "Enter") {
     addTask();
   }
+});
+
+tasks.forEach(function (task) {
+  createTask(task);
 });
