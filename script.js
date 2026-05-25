@@ -26,9 +26,17 @@ function createTask(taskText, completed = false) {
 
   deleteButton.textContent = "Eliminar";
 
-  deleteButton.addEventListener("click", function () {
-    newTask.remove();
+  deleteButton.addEventListener("click", function (event) {
+  event.stopPropagation();
+
+  newTask.remove();
+
+  tasks = tasks.filter(function (task) {
+    return task.text !== taskText;
   });
+
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+});
 
   if (completed) {
     taskSpan.classList.add("completed");
