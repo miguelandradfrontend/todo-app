@@ -1,6 +1,7 @@
 const todoInput = document.querySelector("#todo-input");
 const addTaskButton = document.querySelector("#add-task-btn");
 const todoList = document.querySelector("#todo-list");
+const clearCompletedButton = document.querySelector("#clear-completed-btn");
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
 function updateCounter() {
@@ -16,17 +17,17 @@ function updateCounter() {
     `Pendientes: ${pendingTasks} | Completadas: ${completedTasks}`;
 }
 
-function createTask(taskText, completed = false) {
+function createTask(task) {
   const newTask = document.createElement("li");
 
   const taskCheckbox = document.createElement("input");
   taskCheckbox.type = "checkbox";
-  taskCheckbox.checked = completed;
+  taskCheckbox.checked = task.completed;
 
   const taskSpan = document.createElement("span");
-  taskSpan.textContent = taskText;
+  taskSpan.textContent = task.text;
 
-  if (completed) {
+  if (task.completed) {
     taskSpan.classList.add("completed");
   }
 
@@ -34,13 +35,9 @@ function createTask(taskText, completed = false) {
   deleteButton.textContent = "Eliminar";
 
   taskCheckbox.addEventListener("change", function () {
-    taskSpan.classList.toggle("completed");
+    task.completed = taskCheckbox.checked;
 
-    const taskToUpdate = tasks.find(function (task) {
-      return task.text === taskText;
-    });
-
-    taskToUpdate.completed = taskCheckbox.checked;
+    taskSpan.classList.toggle("completed", task.completed);
 
     localStorage.setItem("tasks", JSON.stringify(tasks));
 
@@ -50,11 +47,12 @@ function createTask(taskText, completed = false) {
   deleteButton.addEventListener("click", function () {
     newTask.remove();
 
-    tasks = tasks.filter(function (task) {
-      return task.text !== taskText;
+    tasks = tasks.filter(function (savedTask) {
+      return savedTask !== task;
     });
 
     localStorage.setItem("tasks", JSON.stringify(tasks));
+
     updateCounter();
   });
 
@@ -71,11 +69,15 @@ function addTask() {
     return;
   }
 
-  createTask(taskText);
-  tasks.push({
+  const task = {
   text: taskText,
   completed: false
-});
+};
+
+tasks.push(task);
+
+createTask(task);
+  
 
   localStorage.setItem("tasks", JSON.stringify(tasks));
 
@@ -95,7 +97,23 @@ todoInput.addEventListener("keydown", function (event) {
 });
 
 tasks.forEach(function (task) {
-  createTask(task.text, task.completed);
+  createTask(task);
 });
 
 updateCounter();
+
+clearCompletedButton.addEventListener("click", function () {
+  tasks = tasks.filter(function (task) {
+    return !task.completed;
+  });
+
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+
+  todoList.innerHTML = "";
+
+  tasks.forEach(function (task) {
+  createTask(task);
+});
+
+  updateCounter();
+});
