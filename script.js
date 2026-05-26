@@ -3,6 +3,19 @@ const addTaskButton = document.querySelector("#add-task-btn");
 const todoList = document.querySelector("#todo-list");
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
+function updateCounter() {
+  const pendingTasks = tasks.filter(function (task) {
+    return !task.completed;
+  }).length;
+
+  const completedTasks = tasks.filter(function (task) {
+    return task.completed;
+  }).length;
+
+  document.querySelector("#task-counter").textContent =
+    `Pendientes: ${pendingTasks} | Completadas: ${completedTasks}`;
+}
+
 function createTask(taskText, completed = false) {
   const newTask = document.createElement("li");
 
@@ -30,6 +43,8 @@ function createTask(taskText, completed = false) {
     taskToUpdate.completed = taskCheckbox.checked;
 
     localStorage.setItem("tasks", JSON.stringify(tasks));
+
+    updateCounter();
   });
 
   deleteButton.addEventListener("click", function () {
@@ -40,6 +55,7 @@ function createTask(taskText, completed = false) {
     });
 
     localStorage.setItem("tasks", JSON.stringify(tasks));
+    updateCounter();
   });
 
   newTask.appendChild(taskCheckbox);
@@ -63,6 +79,8 @@ function addTask() {
 
   localStorage.setItem("tasks", JSON.stringify(tasks));
 
+  updateCounter();
+
   todoInput.value = "";
 }
 
@@ -79,3 +97,5 @@ todoInput.addEventListener("keydown", function (event) {
 tasks.forEach(function (task) {
   createTask(task.text, task.completed);
 });
+
+updateCounter();
