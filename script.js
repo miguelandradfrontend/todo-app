@@ -4,6 +4,19 @@ const todoList = document.querySelector("#todo-list");
 const clearCompletedButton = document.querySelector("#clear-completed-btn");
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
+function saveTasks() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function renderTasks() {
+  todoList.innerHTML = "";
+
+  tasks.forEach(function (task) {
+    createTask(task);
+  });
+}
+
+
 function updateCounter() {
   const pendingTasks = tasks.filter(function (task) {
     return !task.completed;
@@ -39,8 +52,7 @@ function createTask(task) {
 
     taskSpan.classList.toggle("completed", task.completed);
 
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-
+    saveTasks();
     updateCounter();
   });
 
@@ -51,8 +63,7 @@ function createTask(task) {
       return savedTask !== task;
     });
 
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-
+    saveTasks();
     updateCounter();
   });
 
@@ -75,20 +86,13 @@ function addTask() {
 };
 
 tasks.push(task);
-
 createTask(task);
-  
-
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-
-  updateCounter();
-
-  todoInput.value = "";
+saveTasks();
+updateCounter();
+todoInput.value = "";
 }
 
-addTaskButton.addEventListener("click", function () {
-  addTask();
-});
+addTaskButton.addEventListener("click", addTask);
 
 todoInput.addEventListener("keydown", function (event) {
   if (event.key === "Enter") {
@@ -96,10 +100,7 @@ todoInput.addEventListener("keydown", function (event) {
   }
 });
 
-tasks.forEach(function (task) {
-  createTask(task);
-});
-
+renderTasks();
 updateCounter();
 
 clearCompletedButton.addEventListener("click", function () {
@@ -107,13 +108,7 @@ clearCompletedButton.addEventListener("click", function () {
     return !task.completed;
   });
 
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-
-  todoList.innerHTML = "";
-
-  tasks.forEach(function (task) {
-  createTask(task);
-});
-
+  saveTasks();
+  renderTasks();
   updateCounter();
 });
